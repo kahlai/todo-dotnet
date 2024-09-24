@@ -18,6 +18,7 @@ components:
           targetPort: 8080
       env: []
       image: 'quay.io/kahlai/dotnetsdk:8.0'
+      args: ['tail', '-f', '/dev/null']
       memoryLimit: 2Gi
       mountSources: true
       sourceMapping: /projects
