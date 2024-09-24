@@ -1,8 +1,8 @@
 #sample from https://github.com/docker/awesome-compose/blob/master/aspnet-mssql/app/aspnetapp/Dockerfile
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 as base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 as base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 COPY . /src
 WORKDIR /src
 RUN ls
