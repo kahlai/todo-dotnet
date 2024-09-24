@@ -1,6 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using TodoApi.Models;
-using System.Configuration; 
+
+using OpenTelemetry.Trace;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +26,36 @@ builder.Services.AddDbContext<TodoContext>(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+const string serviceName = "todo-development";
+string otlpTraceEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_TRACE_ENDPOINT") ?? builder.Configuration.GetValue("Otlp:Endpoint", defaultValue: "http://localhost:4317")!;
+Console.Out.WriteLine("otlpTraceEndpoint: " + otlpTraceEndpoint);
+builder.Services.AddOpenTelemetry()
+      .ConfigureResource(resource => resource.AddService(serviceName))
+      .WithTracing(tracing => tracing
+          .AddAspNetCoreInstrumentation()
+          .AddEntityFrameworkCoreInstrumentation(options =>
+            {
+                options.EnrichWithIDbCommand = (activity, command) =>
+                {
+                    var stateDisplayName = $"{command.CommandType} main";
+                    activity.DisplayName = stateDisplayName;
+                    activity.SetTag("db.name", stateDisplayName);
+                };
+            })
+          .AddConsoleExporter()
+          .AddOtlpExporter(
+            options =>
+            {
+                //options.Endpoint = new Uri("http://localhost:4317/v1/traces");
+                options.Endpoint = new Uri(otlpTraceEndpoint);
+                options.Protocol = OtlpExportProtocol.Grpc;
+            }
+          ))
+      .WithMetrics(metrics => metrics
+          .AddAspNetCoreInstrumentation()
+          .AddConsoleExporter()
+          .AddOtlpExporter());
 
 var app = builder.Build();
 
