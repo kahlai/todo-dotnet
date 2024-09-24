@@ -25,8 +25,13 @@ components:
       volumeMounts:
         - name: nuget
           path: /home/user/.nuget
+        - name: dotnet
+          path: /.dotnet
     name: tools
   - name: nuget
+    volume:
+      size: 1G
+  - name: dotnet
     volume:
       size: 1G
 commands:
