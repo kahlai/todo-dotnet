@@ -24,7 +24,7 @@ components:
       sourceMapping: /projects
       volumeMounts:
         - name: nuget
-          path: /home/user/.nuget
+          path: /.nuget
         - name: dotnet
           path: /.dotnet
     name: tools
