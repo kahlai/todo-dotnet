@@ -17,7 +17,7 @@ components:
           protocol: http
           targetPort: 8080
       env: []
-      image: 'quay.io/kahlai/dotnetsdk:7.0'
+      image: 'quay.io/kahlai/dotnetsdk:8.0'
       memoryLimit: 2Gi
       mountSources: true
       sourceMapping: /projects
